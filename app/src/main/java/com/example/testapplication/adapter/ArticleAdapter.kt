@@ -28,19 +28,29 @@ class ArticleAdapter(private val loader: ArticleLoader): RecyclerView.Adapter<Ar
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // View 업데이트 시.
         val article = articles[position]
-        // request more articles when needed
-        if (!loading && position >= articles.size - 2){
-            loading = true
-            GlobalScope.launch{
-                loader.loadMore()
-                loading = false
-            }
-        }
+
+//        request more articles when needed
+//        if (!loading && position >= articles.size - 2){
+//            loading = true
+//            GlobalScope.launch{
+//                loader.loadMore()
+//                loading = false
+//            }
+//        }
+
         holder.bind(article)
     }
 
-    fun add(article: List<Article>){
+    fun set(article: List<Article>){
         this.articles.addAll(article)
+        notifyDataSetChanged()
+    }
+    fun add(article: Article){
+        this.articles.add(article)
+        notifyDataSetChanged()
+    }
+    fun clear(){
+        this.articles.clear()
         notifyDataSetChanged()
     }
 

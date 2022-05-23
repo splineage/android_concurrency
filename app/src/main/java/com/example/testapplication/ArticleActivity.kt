@@ -56,7 +56,7 @@ class ArticleActivity: AppCompatActivity() {
 
         launch(Dispatchers.Main) {
             binding.progressBar.visibility = View.GONE
-            viewAdapter.add(article)
+            viewAdapter.set(article)
         }
     }
 

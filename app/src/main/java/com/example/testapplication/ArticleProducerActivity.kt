@@ -34,7 +34,7 @@ class ArticleProducerActivity: AppCompatActivity(), ArticleLoader {
             val articles = producer.receive()
             GlobalScope.launch(Dispatchers.Main) {
                 binding.progressBar.visibility = View.GONE
-                viewAdapter.add(articles)
+                viewAdapter.set(articles)
             }
         }
     }
