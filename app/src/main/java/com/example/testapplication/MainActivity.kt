@@ -3,9 +3,9 @@ package com.example.testapplication
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.databinding.DataBindingUtil
 import com.example.testapplication.databinding.ActivityMainBinding
+import com.example.testapplication.model.Feed
 import kotlinx.coroutines.*
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -58,9 +58,11 @@ class MainActivity : AppCompatActivity() {
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private fun updateAsyncLoadNews() = GlobalScope.launch {
         val requests = mutableListOf<Deferred<List<String>>>()
-        feeds.mapTo(requests){
+
+        newFeeds.mapTo(requests){
             asyncFetchHeadlines(it, multiServiceCallDispatcher)
         }
+
         requests.forEach{
             it.join()
 //            it.await() // error
@@ -84,11 +86,12 @@ class MainActivity : AppCompatActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun asyncFetchHeadlines(
-        feed: String,
+        feed: Feed,
         dispatcher: CoroutineDispatcher
     ) = GlobalScope.async(dispatcher) {
+
         val builder = factory.newDocumentBuilder()
-        val xml = builder.parse(feed)
+        val xml = builder.parse(feed.url)
         val news = xml.getElementsByTagName("channel").item(0)
         (0 until news.childNodes.length)
             .map { news.childNodes.item(it) }
@@ -99,6 +102,8 @@ class MainActivity : AppCompatActivity() {
                 it.getElementsByTagName("title").item(0).textContent
             }
     }
+
+
 
     private fun fetchRssHeadlines(): List<String>{
         val builder = factory.newDocumentBuilder()
