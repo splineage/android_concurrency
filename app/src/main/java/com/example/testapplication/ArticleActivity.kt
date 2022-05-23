@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.testapplication.adapter.ArticleAdapter
+import com.example.testapplication.adapter.ArticleLoader
 import com.example.testapplication.databinding.ActivityArticleBinding
 import com.example.testapplication.databinding.ActivityMainBinding
 import com.example.testapplication.model.Article
@@ -28,7 +29,11 @@ class ArticleActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_article)
-        viewAdapter = ArticleAdapter()
+        viewAdapter = ArticleAdapter(object : ArticleLoader{
+            override suspend fun loadMore() {
+
+            }
+        })
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = viewAdapter
         asyncLoadArticle()

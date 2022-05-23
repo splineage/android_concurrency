@@ -8,10 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.testapplication.R
 import com.example.testapplication.databinding.ArticleBinding
 import com.example.testapplication.model.Article
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-class ArticleAdapter: RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
+class ArticleAdapter(private val loader: ArticleLoader): RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
     lateinit var binding: ArticleBinding
-    val article: MutableList<Article> = mutableListOf()
+    private val articles: MutableList<Article> = mutableListOf()
+    private var loading: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // 새로운 ViewHolder 를 생성할 때마다 호출.
@@ -20,16 +23,24 @@ class ArticleAdapter: RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
         return ViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = article.size
+    override fun getItemCount(): Int = articles.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // View 업데이트 시.
-        val article = article[position]
+        val article = articles[position]
+        // request more articles when needed
+        if (!loading && position >= articles.size - 2){
+            loading = true
+            GlobalScope.launch{
+                loader.loadMore()
+                loading = false
+            }
+        }
         holder.bind(article)
     }
 
     fun add(article: List<Article>){
-        this.article.addAll(article)
+        this.articles.addAll(article)
         notifyDataSetChanged()
     }
 
@@ -42,6 +53,8 @@ class ArticleAdapter: RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
             binding.summary.text = article.summary
         }
     }
+}
 
-
+interface ArticleLoader{
+    suspend fun loadMore()
 }
