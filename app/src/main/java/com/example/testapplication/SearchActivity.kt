@@ -7,9 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.testapplication.adapter.ArticleAdapter
 import com.example.testapplication.adapter.ArticleLoader
 import com.example.testapplication.databinding.ActivitySearchBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class SearchActivity: AppCompatActivity(), ArticleLoader {
     lateinit var binding: ActivitySearchBinding
@@ -26,9 +24,14 @@ class SearchActivity: AppCompatActivity(), ArticleLoader {
         binding.btnSearch.setOnClickListener{
             viewAdapter.clear()
             GlobalScope.launch {
+                ResultsCounter.reset()
                 search()
             }
         }
+        CoroutineScope(Dispatchers.Default).launch {
+            updateCounter()
+        }
+
 
     }
 
@@ -39,6 +42,16 @@ class SearchActivity: AppCompatActivity(), ArticleLoader {
             val article = channel.receive()
             GlobalScope.launch(Dispatchers.Main) {
                 viewAdapter.add(article)
+            }
+        }
+    }
+
+    private suspend fun updateCounter(){
+        val notifications = ResultsCounter.getNotificationChannel()
+        while (!notifications.isClosedForReceive){
+            val newAmount = notifications.receive()
+            withContext(Dispatchers.Main){
+                binding.result.text = "Results: $newAmount"
             }
         }
     }

@@ -57,6 +57,8 @@ class Searcher {
                     }
                     val article = Article(feed.name, title, summary)
                     channel.send(article)
+
+                    ResultsCounter.increment()
                 }
             }
     }

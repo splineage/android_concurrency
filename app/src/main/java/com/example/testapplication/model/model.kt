@@ -10,3 +10,9 @@ data class Article(
     val title: String,
     val summary: String
 )
+
+data class User(
+    val name: String,
+    val age: Int,
+    val profession: String
+)
